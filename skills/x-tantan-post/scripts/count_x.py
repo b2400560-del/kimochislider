@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""X（無料版）の加重文字数を数える。1行=1投稿として読み、上限280を超えていないか判定する。
+"""X（無料版）の加重文字数を数える。1行=1投稿として読み、上限280を超えていないか、目安260以下に収まっているかを判定する。
 
 使い方:
   python3 count_x.py posts.txt
@@ -9,6 +9,7 @@ import re
 import sys
 
 LIMIT = 280
+TARGET = 260  # 手直しの余白を残すための目安
 # twitter-text v3 の重み1の範囲。これ以外（日本語・全角記号・絵文字など）は重み2
 WEIGHT1 = [(0, 4351), (8192, 8205), (8208, 8223), (8242, 8247)]
 URL = re.compile(r"https?://\S+")
@@ -25,7 +26,7 @@ def main() -> int:
     over = 0
     for i, post in enumerate(posts, 1):
         n = weighted_len(post)
-        status = "OK" if n <= LIMIT else "OVER"
+        status = "OK" if n <= TARGET else ("目安超え（260以下に削る）" if n <= LIMIT else "OVER")
         over += n > LIMIT
         print(f"{i:>2}: {n:>3}/{LIMIT} {status}  {post[:20]}…")
     return 1 if over else 0
